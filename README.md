@@ -119,7 +119,15 @@ import { Article } from '@/entities/Article';
 
 // entities → shared
 import { Button } from '@/shared/ui/Button';
+
+// entities → entities (importing a different slice under the same layer)
+import { Comment } from '@/entities/Comment';
+
+// shared → shared (importing a different module under shared)
+import { logger } from '@/shared/lib/logger';
 ```
+
+> 💡 Note: cross-slice imports within the *same layer* are allowed **only** for `entities` and `shared` layers.
 
 **Error:**
 
@@ -127,3 +135,15 @@ import { Button } from '@/shared/ui/Button';
 // entities → features (not allowed)
 import { AuthForm } from '@/features/Auth';
 ```
+
+---
+
+## Global Notes
+
+* **Without an alias (not recommended):**
+
+  ```js
+  // e.g. "entities/Article" directly, but may clash
+  // with node_modules packages of the same name.
+  import { Article } from 'entities/Article';
+  ```
