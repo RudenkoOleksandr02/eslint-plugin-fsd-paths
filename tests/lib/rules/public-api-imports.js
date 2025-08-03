@@ -4,6 +4,7 @@ const {startProjectPath, aliasOptions} = require("../helpers");
 
 const rule = require("../../../lib/rules/public-api-imports"),
   RuleTester = require("eslint").RuleTester;
+const {PUBLIC_ERROR, TESTING_PUBLIC_ERROR} = rule;
 
 const testPatterns = ['**/*.test.ts', '**/*.story.tsx', '**/StoreDecorator.tsx'];
 
@@ -32,19 +33,21 @@ ruleTester.run("public-api-imports", rule, {
   invalid: [
     {
       code: "import { foo } from '@/entities/Article/model/slice/fooSlice'",
-      errors: [{ message: "Absolute import is allowed only from Public Api (index.ts)" }],
-      options: [aliasOptions]
+      errors: [{ messageId: PUBLIC_ERROR }],
+      options: [aliasOptions],
+      output: "import { foo } from '@/entities/Article'",
     },
     {
       filename: `${startProjectPath}\\entities\\Article\\StoreDecorator.tsx`,
       code: "import { bar } from '@/entities/Article/testing/foo.tsx'",
-      errors: [{ message: "Absolute import is allowed only from Public Api (index.ts)" }],
+      errors: [{ messageId: PUBLIC_ERROR }],
       options: [{ ...aliasOptions, testFilesPatterns: testPatterns }],
+      output: "import { bar } from '@/entities/Article'",
     },
     {
       filename: `${startProjectPath}\\entities\\Article\\utils.ts`,
       code: "import { data } from '@/entities/Article/testing'",
-      errors: [{ message: "Test data must be imported from Public Api (testing.ts)" }],
+      errors: [{ messageId: TESTING_PUBLIC_ERROR }],
       options: [{ ...aliasOptions, testFilesPatterns: testPatterns }],
     },
   ],

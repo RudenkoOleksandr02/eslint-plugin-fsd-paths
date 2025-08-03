@@ -71,7 +71,7 @@ import { helper } from '@/features/MyFeature/model/helper';
 
 ### 2. `public-api-imports`
 
-**Purpose:** Allow only public API (index.ts) or, in test files, testing API (testing.ts) imports from other slices.
+**Purpose:** Allow only public API (`index.ts`) or, in test files, testing API (`testing.ts`) imports from other slices.
 
 * **Options:**
 
@@ -84,7 +84,7 @@ import { helper } from '@/features/MyFeature/model/helper';
 // public API
 import { getUser } from '@/entities/User';
 
-// testing API in matching test files
+// testing API in test files
 import { mockUser } from '@/entities/User/testing';
 ```
 
@@ -94,9 +94,23 @@ import { mockUser } from '@/entities/User/testing';
 // deep import outside index.ts
 import { api } from '@/entities/User/model/api'; // ✕
 
-// testing import in non-test file
+// testing API import in non-test file
 import { mock } from '@/entities/User/testing'; // ✕
 ```
+
+> **Auto-fix**
+> When you run ESLint with the `--fix` flag, deep imports will be automatically replaced with the public API:
+>
+> ```bash
+> npx eslint --fix path/to/file.ts
+> ```
+>
+> For example:
+>
+> ```diff
+> - import { api } from '@/entities/User/model/api';
+> + import { api } from '@/entities/User';
+> ```
 
 ### 3. `layer-imports`
 
@@ -127,7 +141,7 @@ import { Comment } from '@/entities/Comment';
 import { logger } from '@/shared/lib/logger';
 ```
 
-> 💡 Note: cross-slice imports within the *same layer* are allowed **only** for `entities` and `shared` layers.
+> 💡 Note: Cross-slice imports within the same layer are allowed only for the `entities` and `shared` layers.
 
 **Error:**
 
@@ -143,7 +157,7 @@ import { AuthForm } from '@/features/Auth';
 * **Without an alias (not recommended):**
 
   ```js
-  // e.g. "entities/Article" directly, but may clash
+  // e.g. "entities/Article" directly, but this may conflict
   // with node_modules packages of the same name.
   import { Article } from 'entities/Article';
   ```
