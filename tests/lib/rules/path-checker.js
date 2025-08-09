@@ -19,12 +19,20 @@ ruleTester.run("path-checker", rule, {
       filename: `${startProjectPath}\\entities\\Article\\ui\\ArticleCard.tsx`,
       code: "import { addCommentFormActions, addCommentFormReducer } from '@/entities/Article/model/slice/addCommentFormSlice.ts'",
       errors: [{ message: "Within a single feature slice, all paths must be relative" }],
-      options: [aliasOptions]
+      options: [aliasOptions],
+      output: "import { addCommentFormActions, addCommentFormReducer } from '../model/slice/addCommentFormSlice.ts'",
     },
     {
       filename: `${startProjectPath}\\entities\\Article\\ui\\ArticleCard.tsx`,
       code: "import { addCommentFormActions, addCommentFormReducer } from 'entities/Article/model/slice/addCommentFormSlice.ts'",
       errors: [{ message: "Within a single feature slice, all paths must be relative" }],
+      output: "import { addCommentFormActions, addCommentFormReducer } from '../model/slice/addCommentFormSlice.ts'",
+    },
+    {
+      filename: `${startProjectPath}\\entities\\Article\\index.ts`,
+      code: "import { addCommentFormActions, addCommentFormReducer } from 'entities/Article/model/slice/addCommentFormSlice.ts'",
+      errors: [{ message: "Within a single feature slice, all paths must be relative" }],
+      output: "import { addCommentFormActions, addCommentFormReducer } from './model/slice/addCommentFormSlice.ts'",
     },
   ],
 });

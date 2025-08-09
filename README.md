@@ -1,29 +1,37 @@
-## eslint-plugin-fsd-paths
+# eslint-plugin-fsd-paths
 
-ESLint plugin for enforcing import path rules in Feature‑Sliced Design (FSD) projects.
+ESLint plugin for enforcing import path rules in Feature‑Sliced Design (FSD) projects. Keeps import paths consistent: relative imports inside a slice, public API usage between slices, and correct layer ordering.
 
 ---
 
-### Installation
+## Requirements
 
-Install ESLint if you haven’t already:
+* Project structure: `src/{app,pages,widgets,features,entities,shared}`
+* `alias` should be provided without a trailing slash, e.g. `@`
 
-```sh
+---
+
+## Installation
+
+Install ESLint (if not already):
+
+```bash
 npm install --save-dev eslint
 ```
 
-Then install the plugin:
+Install the plugin:
 
-```sh
+```bash
 npm install --save-dev @sashar/eslint-plugin-fsd-paths
 ```
 
-### Usage
+---
 
-In your ESLint config (`.eslintrc.js` or `.eslintrc.json`):
+## Usage
+
+Add the plugin and rules to your ESLint config (example `.eslintrc.js`):
 
 ```js
-// .eslintrc.js
 module.exports = {
   plugins: ['@sashar/fsd-paths'],
   rules: {
@@ -53,13 +61,13 @@ module.exports = {
 
 **Purpose:** Ensure imports within the same feature slice use relative paths.
 
-* **Option:** `alias` (`string`) — your project alias (e.g. `"@"`).
+**Option:** `alias` (`string`) — your project alias (e.g. `"@"`).
 
 **Valid:**
 
 ```js
 // same slice, relative
-import { helper } from '../model/slice/helper';
+import { helper } from '../model/helper';
 ```
 
 **Invalid:**
@@ -69,16 +77,21 @@ import { helper } from '../model/slice/helper';
 import { helper } from '@/features/MyFeature/model/helper';
 ```
 
+**Auto-fix:**
+Running ESLint with `--fix` will convert deep absolute imports into relative ones.
+
+---
+
 ### 2. `public-api-imports`
 
-**Purpose:** Allow only public API (`index.ts`) or, in test files, testing API (`testing.ts`) imports from other slices.
+**Purpose:** Enforce imports from other slices go through the public API (`index.ts`). Test files may import from `testing.ts`.
 
-* **Options:**
+**Options:**
 
-  * `alias` (`string`)
-  * `testFilesPatterns` (`string[]`) — glob patterns for test files.
+* `alias` (`string`)
+* `testFilesPatterns` (`string[]`) — glob patterns for test files
 
-**Allowed:**
+**Valid:**
 
 ```js
 // public API
@@ -88,7 +101,7 @@ import { getUser } from '@/entities/User';
 import { mockUser } from '@/entities/User/testing';
 ```
 
-**Errors:**
+**Invalid:**
 
 ```js
 // deep import outside index.ts
@@ -98,34 +111,27 @@ import { api } from '@/entities/User/model/api'; // ✕
 import { mock } from '@/entities/User/testing'; // ✕
 ```
 
-> **Auto-fix**
-> When you run ESLint with the `--fix` flag, deep imports will be automatically replaced with the public API:
->
-> ```bash
-> npx eslint --fix path/to/file.ts
-> ```
->
-> For example:
->
-> ```diff
-> - import { api } from '@/entities/User/model/api';
-> + import { api } from '@/entities/User';
-> ```
+**Auto-fix:**
+`--fix` will replace deep imports with the public API import, e.g. `@/entities/User`.
+
+---
 
 ### 3. `layer-imports`
 
-**Purpose:** Enforce allowed import directions between layers:
+**Purpose:** Enforce allowed import directions between layers.
+
+Allowed flow:
 
 ```
 app → pages → widgets → features → entities → shared
 ```
 
-* **Options:**
+**Options:**
 
-  * `alias` (`string`)
-  * `ignoreImportPatterns` (`string[]`) — glob patterns to skip.
+* `alias` (`string`)
+* `ignoreImportPatterns` (`string[]`) — glob patterns to skip
 
-**Valid:**
+**Examples — allowed:**
 
 ```js
 // features → entities
@@ -134,16 +140,16 @@ import { Article } from '@/entities/Article';
 // entities → shared
 import { Button } from '@/shared/ui/Button';
 
-// entities → entities (importing a different slice under the same layer)
+// entities → entities (different slice)
 import { Comment } from '@/entities/Comment';
 
-// shared → shared (importing a different module under shared)
+// shared → shared
 import { logger } from '@/shared/lib/logger';
 ```
 
-> 💡 Note: Cross-slice imports within the same layer are allowed only for the `entities` and `shared` layers.
+> Note: Cross-slice imports inside the same layer are allowed only for `entities` and `shared`.
 
-**Error:**
+**Invalid example:**
 
 ```js
 // entities → features (not allowed)
@@ -152,12 +158,25 @@ import { AuthForm } from '@/features/Auth';
 
 ---
 
-## Global Notes
+## Recommendations
 
-* **Without an alias (not recommended):**
+* Use an alias (e.g. `@`) to avoid conflicts with `node_modules`.
+* Configure `testFilesPatterns` to match your test files (Jest, Vitest, etc.).
+* Add `ignoreImportPatterns` for styles or special provider modules that should be excluded from checks.
 
-  ```js
-  // e.g. "entities/Article" directly, but this may conflict
-  // with node_modules packages of the same name.
-  import { Article } from 'entities/Article';
-  ```
+---
+
+## CLI
+
+Run ESLint for a file:
+
+```bash
+npx eslint path/to/file.ts
+```
+
+Run with auto-fix:
+
+```bash
+npx eslint --fix path/to/file.ts
+```
+

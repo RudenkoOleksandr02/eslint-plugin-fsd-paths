@@ -1,6 +1,6 @@
 {
   "name": "@sashar/eslint-plugin-fsd-paths",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "ESLint plugin for checking the correctness of import paths in FSD architecture",
   "keywords": [
     "eslint",
