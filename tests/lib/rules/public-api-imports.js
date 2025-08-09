@@ -28,6 +28,11 @@ ruleTester.run("public-api-imports", rule, {
       code: "import { decorator } from '@/entities/Article/testing'",
       options: [{ ...aliasOptions, testFilesPatterns: testPatterns }],
     },
+    {
+      filename: `${startProjectPath}/entities/Article/Article.test.ts`,
+      code: "import { testData } from '@/entities/Article/testing'",
+      options: [{ ...aliasOptions, testFilesPatterns: testPatterns }],
+    }
   ],
 
   invalid: [
@@ -50,5 +55,11 @@ ruleTester.run("public-api-imports", rule, {
       errors: [{ messageId: TESTING_PUBLIC_ERROR }],
       options: [{ ...aliasOptions, testFilesPatterns: testPatterns }],
     },
+    {
+      filename: `${startProjectPath}/entities/Article/utils.ts`,
+      code: "import { data } from '@/entities/Article/testing'",
+      errors: [{ messageId: TESTING_PUBLIC_ERROR }],
+      options: [{ ...aliasOptions, testFilesPatterns: testPatterns }],
+    }
   ],
 });

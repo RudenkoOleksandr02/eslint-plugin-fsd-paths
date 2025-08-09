@@ -36,6 +36,19 @@ ruleTester.run("layer-imports", rule, {
         ignoreImportPatterns: ['**/app/providers/**']
       }],
     },
+    {
+      filename: `${startProjectPath}/widgets/Sidebar/index.tsx`,
+      code: "import { Article } from '@/entities/Article'",
+      options: [aliasOptions],
+    },
+    {
+      filename: `${startProjectPath}/app/layout.tsx`,
+      code: "import { StoreProvider } from '@/app/providers/StoreProvider'",
+      options: [{
+        ...aliasOptions,
+        ignoreImportPatterns: ['**/app/providers/**']
+      }],
+    },
   ],
 
   invalid: [
@@ -63,5 +76,13 @@ ruleTester.run("layer-imports", rule, {
         message: "A layer can only import layers below it (app → pages → widgets → features → entities → shared)"
       }],
     },
+    {
+      filename: `${startProjectPath}/features/Auth/AuthForm.tsx`,
+      code: "import { HomePage } from '@/pages/Home'",
+      options: [aliasOptions],
+      errors: [{
+        message: "A layer can only import layers below it (app → pages → widgets → features → entities → shared)"
+      }],
+    }
   ],
 });
